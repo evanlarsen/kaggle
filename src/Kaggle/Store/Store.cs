@@ -33,7 +33,7 @@ namespace Kaggle
 
         public Task<Book> GetBook(Guid id)
         {
-            var storedBook = books.FirstOrDefault(b => b.Id.Equals(book.Id));
+            var storedBook = books.FirstOrDefault(b => b.Id.Equals(id));
             if (storedBook == null)
             {
                 throw new ArgumentException($"book with id {id} was not found");

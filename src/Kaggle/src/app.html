@@ -6,4 +6,11 @@
     <button type="button" class="btn btn-default">Middle</button>
     <button type="button" class="btn btn-default">Right</button>
   </div>
+
+  <table class="table table-striped">
+    <tr repeat.for="book of books">
+      <td>${book.name}</td>
+      <td>${book.price | dollarsFormat}</td>
+    </tr>
+  </table>
 </template>
