@@ -135,12 +135,7 @@
             "main": "aurelia-testing",
             "env": "dev"
           },
-          {
-            "name": "jquery",
-            "path": "../node_modules/jquery/dist",
-            "main": "jquery.min",
-            "exports": "$"
-          },
+          "jquery",
           {
             "name": "bootstrap",
             "path": "../node_modules/bootstrap/dist",
@@ -148,6 +143,12 @@
             "deps": [ "jquery" ],
             "exports": "$",
             "resources": [ "css/bootstrap.css" ]
+          },
+          {
+            "name": "nprogress",
+            "path": "../node_modules/nprogress",
+            "main": "nprogress",
+            "resources": [ "nprogress.css" ]
           }
         ]
       }

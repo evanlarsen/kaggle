@@ -1,16 +1,23 @@
 <template>
   <require from="bootstrap/css/bootstrap.css"></require>
-  <h1>${message}</h1>
-  <div class="btn-group" role="group" aria-label="...">
-    <button type="button" class="btn btn-default">Left</button>
-    <button type="button" class="btn btn-default">Middle</button>
-    <button type="button" class="btn btn-default">Right</button>
-  </div>
+  <require from="./styles.css"></require>
+  <require from="./contact-list"></require>
 
-  <table class="table table-striped">
-    <tr repeat.for="book of books">
-      <td>${book.name}</td>
-      <td>${book.price | dollarsFormat}</td>
-    </tr>
-  </table>
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">
+        <i class="fa fa-user"></i>
+        <span>Contacts</span>
+      </a>
+    </div>
+  </nav>
+
+  <loading-indicator loading.bind="router.isNavigating || api.isRequesting"></loading-indicator>
+
+  <div class="container">
+    <div class="row">
+      <contact-list class="col-md-4"></contact-list>
+      <router-view class="col-md-8"></router-view>
+    </div>
+  </div>
 </template>

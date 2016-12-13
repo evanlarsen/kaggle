@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Kaggle.Store;
 
 namespace Kaggle
 {
@@ -29,7 +30,7 @@ namespace Kaggle
         {
             // Add framework services.
             services.AddMvc();
-            services.AddSingleton<IStore, Store>();
+            services.AddSingleton<IContactsStore, ContactsStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +40,7 @@ namespace Kaggle
             loggerFactory.AddDebug();
 
             app.UseMvc();
+            app.UseDefaultFiles(); //needs to be before UseStaticFiles();
             app.UseStaticFiles();
         }
     }

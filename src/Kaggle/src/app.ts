@@ -1,18 +1,20 @@
 import {autoinject} from 'aurelia-framework';
-import {Store} from './store';
-import {Book} from './book';
+import {Router} from 'aurelia-router';
+import {WebApi} from './web-api';
 
 @autoinject
 export class App {
-  message = 'Hello World!';
-  public books: Book[];
+  router: Router;
 
-  constructor(private store: Store) { }
+  constructor(private api: WebApi) { }
 
-  bind() {
-    return this.store.getBooks().then(books => {
-      this.books = books;
-      console.log(books);
-    });
+  configureRouter(config, router){
+    config.title = 'Contacts';
+    config.map([
+      { route: '',              moduleId: 'no-selection',   title: 'Select'},
+      { route: 'contacts/:id',  moduleId: 'contact-detail', name:'contacts' }
+    ]);
+
+    this.router = router;
   }
 }

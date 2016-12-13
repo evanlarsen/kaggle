@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/a4a4b87bc91507afa71664b7c1612798ab11896f/nprogress/NProgress.d.ts",
+    "raw": "registry:dt/nprogress#0.0.0+20161003122759",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/a4a4b87bc91507afa71664b7c1612798ab11896f/nprogress/NProgress.d.ts"
+  }
+}

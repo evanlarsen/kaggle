@@ -3,84 +3,71 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Kaggle
+namespace Kaggle.Store
 {
-    public interface IStore
+    public interface IContactsStore
     {
-        Task<List<Book>> GetBooks();
-        Task<Guid> SaveBook(Book book);
-        Task<Book> GetBook(Guid id);
-        Task DeleteBook(Guid id);
+        Task<List<Contact>> GetContactList();
+        Task<Contact> SaveContact(Contact book);
+        Task<Contact> GetContactDetails(int id);
     }
-    public class Store : IStore
-    {
-        readonly List<Book> books;
 
-        public Store()
+    public class ContactsStore : IContactsStore
+    {
+        int id = 0;
+        readonly List<Contact> contacts;
+        int GetId() { return ++id; }
+
+        public ContactsStore()
         {
-            this.books = new List<Book>();
-            this.books.AddRange(new List<Book>
+            contacts = new List<Contact>();
+            contacts.AddRange(new List<Contact>
             {
-                new Book { Id = Guid.NewGuid(), Name = "Peter Pan", Price = 2 },
-                new Book { Id = Guid.NewGuid(), Name = "", Price = 5 }
+                new Contact { Id = GetId(), FirstName = "John", LastName = "Tolkien", Email = "tolkien@inklings.com", PhoneNumber = "867-5309" },
+                new Contact { Id = GetId(), FirstName = "Clive", LastName = "Lewis", Email = "lewis@inklings.com", PhoneNumber = "867-5309" },
+                new Contact { Id = GetId(), FirstName = "Owen", LastName = "Barfield", Email = "barfield@inklings.com", PhoneNumber = "867-5309" },
+                new Contact { Id = GetId(), FirstName = "Charles", LastName = "Williams", Email = "williams@inklings.com", PhoneNumber = "867-5309" },
+                new Contact { Id = GetId(), FirstName = "Roger", LastName = "Green", Email = "green@inklings.com", PhoneNumber = "867-5309" },
             });
         }
 
-        public Task<List<Book>> GetBooks()
+        public Task<List<Contact>> GetContactList()
         {
-            return Task.FromResult(books);
+            return Task.FromResult(contacts);
         }
 
-        public Task<Book> GetBook(Guid id)
+        public Task<Contact> GetContactDetails(int id)
         {
-            var storedBook = books.FirstOrDefault(b => b.Id.Equals(id));
-            if (storedBook == null)
+            var contact = contacts.FirstOrDefault(c => c.Id.Equals(id));
+            if (contact == null)
             {
-                throw new ArgumentException($"book with id {id} was not found");
+                throw new ArgumentException($"contact with id {id} was not found");
             }
-            return Task.FromResult(storedBook);
+            return Task.FromResult(contact);
         }
 
-        public Task DeleteBook(Guid id)
+        public Task<Contact> SaveContact(Contact contact)
         {
-            var book = GetBook(id).Result;
-            books.Remove(book);
-            return Task.FromResult(true);
-        }
-
-        public Task<Guid> SaveBook(Book book)
-        {
-            if (string.IsNullOrWhiteSpace(book.Name))
+            var found = contacts.FirstOrDefault(c => c.Id.Equals(contact.Id));
+            if (found != null)
             {
-                throw new ArgumentException("book name is required");
+                var index = contacts.IndexOf(found);
+                contacts[index] = contact;
+            } else
+            {
+                contact.Id = GetId();
+                contacts.Add(contact);
             }
-            if (book.Id == null)
-            {
-                book.Id = Guid.NewGuid();
-            }else
-            {
-                UpdateBook(book);
-            }
-            return Task.FromResult(book.Id);
-        }
-
-        void UpdateBook(Book book)
-        {
-            var storedBook = GetBook(book.Id).Result;
-            storedBook.Name = book.Name;
-            storedBook.Price = book.Price;
-        }
-
-        void InsertBook(Book book)
-        {
-            books.Add(book);
+            return Task.FromResult(contact);
         }
     }
 
-    public class Book
+    public class Contact
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public int Price { get; set; }
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }
