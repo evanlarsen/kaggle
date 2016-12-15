@@ -25,7 +25,7 @@ namespace Kaggle.Controllers
 
         // GET api/leaderboard/{id}
         [HttpGet("api/leaderboard/{id}")]
-        public async Task<List<Record>> GetById(string id)
+        public async Task<List<RecordWithRank>> GetById(string id)
         {
             return await store.GetRecordsForLeaderboard(id);
         }

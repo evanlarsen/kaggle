@@ -14,7 +14,7 @@ namespace Kaggle.Store
         Task<List<Record>> GetRecords();
         Task<Record> SaveRecord(Record record);
         Task<Record> GetRecordDetails(int id);
-        Task<List<Record>> GetRecordsForLeaderboard(string leaderboard);
+        Task<List<RecordWithRank>> GetRecordsForLeaderboard(string leaderboard);
         Task<List<string>> GetLeaderboards();
     }
 
@@ -35,9 +35,13 @@ namespace Kaggle.Store
             return Task.FromResult(records);
         }
 
-        public Task<List<Record>> GetRecordsForLeaderboard(string leaderboard)
+        public Task<List<RecordWithRank>> GetRecordsForLeaderboard(string leaderboard)
         {
-            var leaderboardRecords = records.Where(r => r.CompetitionName.Equals(leaderboard, StringComparison.CurrentCultureIgnoreCase));
+            var leaderboardRecords = records
+                .Where(r => r.CompetitionName.Equals(leaderboard, StringComparison.CurrentCultureIgnoreCase))
+                .OrderByDescending(r => r.Score)
+                .Select((value, index) => new RecordWithRank(index+1, value));
+
             return Task.FromResult(leaderboardRecords.ToList());
         }
 
@@ -101,16 +105,7 @@ namespace Kaggle.Store
             string[] result = Regex.Split(line, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
             if (result != null && result.Length == 6)
             {
-                return new Record
-                {
-                    Id = GetId(),
-                    CompetitionName = result[0],
-                    TeamName = result[1],
-                    UserNames = result[2],
-                    Score = result[3],
-                    ScoreFirstSubmittedDate = result[4],
-                    NumSubmissions = result[5]
-                };
+                return new Record(GetId(), result);
             }
             return null;
         }

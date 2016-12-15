@@ -1,6 +1,6 @@
 ﻿import {autoinject} from 'aurelia-framework';
 import {RouteConfig} from 'aurelia-router';
-import {WebApi, Record} from './web-api';
+import {WebApi, RecordWithRank} from './web-api';
 import {areEqual} from './utility';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {LeaderboardViewed} from './messages';
@@ -8,7 +8,7 @@ import {LeaderboardViewed} from './messages';
 @autoinject
 export class LeaderboardDetail {
   routeConfig: RouteConfig;
-  records: Record[];
+  records: RecordWithRank[];
 
   constructor(private api: WebApi, private ea: EventAggregator) { }
 
@@ -22,5 +22,9 @@ export class LeaderboardDetail {
     });
   }
 
+  interface 
+  attached() {
+    (<any>$('a[data-toggle=popover]')).popover();
+  }
 
 }

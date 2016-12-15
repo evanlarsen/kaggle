@@ -1,7 +1,7 @@
 import {autoinject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 
-export type Record = {
+export interface Record {
   id: number;
   competitionName: string;
   teamName: string;
@@ -9,7 +9,11 @@ export type Record = {
   score: string;
   scoreFirstSubmittedDate: string;
   numSubmissions: string;
-};
+}
+
+export interface RecordWithRank extends Record {
+  rank: number;
+}
 
 @autoinject
 export class WebApi {
@@ -53,7 +57,7 @@ export class WebApi {
     });
   }
 
-  getLeaderboard(id): Promise<Record[]>{
+  getLeaderboard(id): Promise<RecordWithRank[]>{
     this.isRequesting = true;
     return new Promise(resolve => {
       this.client
