@@ -9,10 +9,10 @@ export class App {
   constructor(private api: WebApi) { }
 
   configureRouter(config, router){
-    config.title = 'Contacts';
+    config.title = 'Leaderboards';
     config.map([
       { route: '',              moduleId: 'no-selection',   title: 'Select'},
-      { route: 'contacts/:id',  moduleId: 'contact-detail', name:'contacts' }
+      { route: 'leaderboard/:id',  moduleId: 'leaderboard-detail', name:'leaderboard' }
     ]);
 
     this.router = router;

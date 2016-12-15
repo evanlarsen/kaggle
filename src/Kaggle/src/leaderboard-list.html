@@ -1,0 +1,11 @@
+﻿<template>
+  <div class="leaderboard-list">
+    <ul class="list-group">
+      <li repeat.for="leaderboard of leaderboards" class="list-group-item ${leaderboard === $parent.selectedId ? 'active' : ''}">
+        <a route-href="route: leaderboard; params.bind: {id:leaderboard}" click.delegate="$parent.select(leaderboard)">
+          <h4 class="list-group-item-heading">${leaderboard}</h4>
+        </a>
+      </li>
+    </ul>
+  </div>
+</template>

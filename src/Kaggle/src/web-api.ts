@@ -1,12 +1,14 @@
 import {autoinject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 
-export type Contact = {
+export type Record = {
   id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
+  competitionName: string;
+  teamName: string;
+  userNames: string;
+  score: string;
+  scoreFirstSubmittedDate: string;
+  numSubmissions: string;
 };
 
 @autoinject
@@ -36,45 +38,60 @@ export class WebApi {
     });
   }
   
-  getContactList(): Promise<Contact[]>{
+  getLeaderboards(): Promise<Record[]>{
     this.isRequesting = true;
     return new Promise(resolve => {
       this.client
-        .fetch('contacts')
+        .fetch('records')
         .then(response => {
           response.json()
-            .then(contacts => {
-              resolve(contacts);
+            .then(records => {
+              resolve(records);
               this.isRequesting = false;
             });
         });
     });
   }
 
-  getContactDetails(id): Promise<Contact>{
+  getLeaderboard(id): Promise<Record[]>{
     this.isRequesting = true;
     return new Promise(resolve => {
       this.client
-        .fetch(`contacts/${id}`)
+        .fetch(`leaderboard/${id}`)
         .then(response => {
           response.json()
-            .then(contact => {
-              resolve(contact);
+            .then(records => {
+              resolve(records);
               this.isRequesting = false;
             });
         });
     });
   }
 
-  saveContact(contact): Promise<Contact>{
+  getListOfLeaderboards(): Promise<string[]> {
     this.isRequesting = true;
     return new Promise(resolve => {
       this.client
-        .fetch('contacts', { method: 'POST', body: json(contact) })
+        .fetch('leaderboards')
         .then(response => {
           response.json()
-            .then(contact => {
-              resolve(contact);
+            .then(leaderboards => {
+              resolve(leaderboards);
+              this.isRequesting = false;
+            });
+        });
+    });
+  }
+
+  saveRecord(record): Promise<Record>{
+    this.isRequesting = true;
+    return new Promise(resolve => {
+      this.client
+        .fetch('leaderboard', { method: 'POST', body: json(record) })
+        .then(response => {
+          response.json()
+            .then(record => {
+              resolve(record);
               this.isRequesting = false;
             });
         });

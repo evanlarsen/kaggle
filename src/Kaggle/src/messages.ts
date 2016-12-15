@@ -1,7 +1,7 @@
-export class ContactUpdated {
-  constructor(public contact){ }
+export class RecordUpdated {
+  constructor(public record){ }
 }
 
-export class ContactViewed {
-  constructor(public contact){ }
+export class LeaderboardViewed {
+  constructor(public leaderboard){ }
 }

@@ -34,43 +34,57 @@ define('web-api',["require", "exports", "aurelia-framework", "aurelia-fetch-clie
                 });
             });
         }
-        getContactList() {
+        getLeaderboards() {
             this.isRequesting = true;
             return new Promise(resolve => {
                 this.client
-                    .fetch('contacts')
+                    .fetch('records')
                     .then(response => {
                     response.json()
-                        .then(contacts => {
-                        resolve(contacts);
+                        .then(records => {
+                        resolve(records);
                         this.isRequesting = false;
                     });
                 });
             });
         }
-        getContactDetails(id) {
+        getLeaderboard(id) {
             this.isRequesting = true;
             return new Promise(resolve => {
                 this.client
-                    .fetch(`contacts/${id}`)
+                    .fetch(`leaderboard/${id}`)
                     .then(response => {
                     response.json()
-                        .then(contact => {
-                        resolve(contact);
+                        .then(records => {
+                        resolve(records);
                         this.isRequesting = false;
                     });
                 });
             });
         }
-        saveContact(contact) {
+        getListOfLeaderboards() {
             this.isRequesting = true;
             return new Promise(resolve => {
                 this.client
-                    .fetch('contacts', { method: 'POST', body: aurelia_fetch_client_1.json(contact) })
+                    .fetch('leaderboards')
                     .then(response => {
                     response.json()
-                        .then(contact => {
-                        resolve(contact);
+                        .then(leaderboards => {
+                        resolve(leaderboards);
+                        this.isRequesting = false;
+                    });
+                });
+            });
+        }
+        saveRecord(record) {
+            this.isRequesting = true;
+            return new Promise(resolve => {
+                this.client
+                    .fetch('leaderboard', { method: 'POST', body: aurelia_fetch_client_1.json(record) })
+                    .then(response => {
+                    response.json()
+                        .then(record => {
+                        resolve(record);
                         this.isRequesting = false;
                     });
                 });
@@ -100,10 +114,10 @@ define('app',["require", "exports", "aurelia-framework", "./web-api"], function 
             this.api = api;
         }
         configureRouter(config, router) {
-            config.title = 'Contacts';
+            config.title = 'Leaderboards';
             config.map([
                 { route: '', moduleId: 'no-selection', title: 'Select' },
-                { route: 'contacts/:id', moduleId: 'contact-detail', name: 'contacts' }
+                { route: 'leaderboard/:id', moduleId: 'leaderboard-detail', name: 'leaderboard' }
             ]);
             this.router = router;
         }
@@ -127,6 +141,15 @@ define('book',["require", "exports"], function (require, exports) {
     exports.Book = Book;
 });
 
+define('environment',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {
+        debug: true,
+        testing: true
+    };
+});
+
 define('utility',["require", "exports"], function (require, exports) {
     "use strict";
     function areEqual(obj1, obj2) {
@@ -138,18 +161,18 @@ define('utility',["require", "exports"], function (require, exports) {
 
 define('messages',["require", "exports"], function (require, exports) {
     "use strict";
-    class ContactUpdated {
-        constructor(contact) {
-            this.contact = contact;
+    class RecordUpdated {
+        constructor(record) {
+            this.record = record;
         }
     }
-    exports.ContactUpdated = ContactUpdated;
-    class ContactViewed {
-        constructor(contact) {
-            this.contact = contact;
+    exports.RecordUpdated = RecordUpdated;
+    class LeaderboardViewed {
+        constructor(leaderboard) {
+            this.leaderboard = leaderboard;
         }
     }
-    exports.ContactViewed = ContactViewed;
+    exports.LeaderboardViewed = LeaderboardViewed;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -161,49 +184,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('contact-detail',["require", "exports", "aurelia-framework", "./web-api", "./utility", "aurelia-event-aggregator", "./messages"], function (require, exports, aurelia_framework_1, web_api_1, utility_1, aurelia_event_aggregator_1, messages_1) {
+define('leaderboard-detail',["require", "exports", "aurelia-framework", "./web-api", "aurelia-event-aggregator", "./messages"], function (require, exports, aurelia_framework_1, web_api_1, aurelia_event_aggregator_1, messages_1) {
     "use strict";
-    let ContactDetail = class ContactDetail {
+    let LeaderboardDetail = class LeaderboardDetail {
         constructor(api, ea) {
             this.api = api;
             this.ea = ea;
         }
         activate(params, routeConfig) {
             this.routeConfig = routeConfig;
-            return this.api.getContactDetails(params.id).then(contact => {
-                this.contact = contact;
-                this.routeConfig.navModel.setTitle(contact.firstName);
-                this.originalContact = JSON.parse(JSON.stringify(contact));
-                this.ea.publish(new messages_1.ContactViewed(this.contact));
+            return this.api.getLeaderboard(params.id).then(records => {
+                this.records = records;
+                this.routeConfig.navModel.setTitle(params.id);
+                this.ea.publish(new messages_1.LeaderboardViewed(params.id));
             });
-        }
-        get canSave() {
-            return this.contact.firstName && this.contact.lastName && !this.api.isRequesting;
-        }
-        save() {
-            this.api.saveContact(this.contact).then(contact => {
-                this.contact = contact;
-                this.routeConfig.navModel.setTitle(contact.firstName);
-                this.originalContact = JSON.parse(JSON.stringify(contact));
-                this.ea.publish(new messages_1.ContactUpdated(this.contact));
-            });
-        }
-        canDeactivate() {
-            if (!utility_1.areEqual(this.originalContact, this.contact)) {
-                let result = confirm('You have unsaved changes. Are you sure you wish to leave?');
-                if (!result) {
-                    this.ea.publish(new messages_1.ContactViewed(this.contact));
-                }
-                return result;
-            }
-            return true;
         }
     };
-    ContactDetail = __decorate([
+    LeaderboardDetail = __decorate([
         aurelia_framework_1.autoinject,
         __metadata("design:paramtypes", [web_api_1.WebApi, aurelia_event_aggregator_1.EventAggregator])
-    ], ContactDetail);
-    exports.ContactDetail = ContactDetail;
+    ], LeaderboardDetail);
+    exports.LeaderboardDetail = LeaderboardDetail;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -215,41 +216,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('contact-list',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "./web-api", "./messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, web_api_1, messages_1) {
+define('leaderboard-list',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "./web-api", "./messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, web_api_1, messages_1) {
     "use strict";
-    let ContactList = class ContactList {
+    let LeaderboardList = class LeaderboardList {
         constructor(api, ea) {
             this.api = api;
             this.ea = ea;
-            ea.subscribe(messages_1.ContactViewed, msg => this.select(msg.contact));
-            ea.subscribe(messages_1.ContactUpdated, msg => {
-                let id = msg.contact.id;
-                let found = this.contacts.find(x => x.id === id);
-                Object.assign(found, msg.contact);
-            });
+            ea.subscribe(messages_1.LeaderboardViewed, msg => this.select(msg));
         }
         created() {
-            this.api.getContactList().then(contacts => this.contacts = contacts);
+            this.api.getListOfLeaderboards().then(leaderboards => this.leaderboards = leaderboards);
         }
-        select(contact) {
-            this.selectedId = contact.id;
+        select(leaderboard) {
+            this.selectedId = leaderboard;
             return true;
         }
     };
-    ContactList = __decorate([
+    LeaderboardList = __decorate([
         aurelia_framework_1.autoinject,
         __metadata("design:paramtypes", [web_api_1.WebApi, aurelia_event_aggregator_1.EventAggregator])
-    ], ContactList);
-    exports.ContactList = ContactList;
-});
-
-define('environment',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = {
-        debug: true,
-        testing: true
-    };
+    ], LeaderboardList);
+    exports.LeaderboardList = LeaderboardList;
 });
 
 define('main',["require", "exports", "./environment"], function (require, exports, environment_1) {
@@ -279,7 +266,7 @@ define('no-selection',["require", "exports"], function (require, exports) {
     "use strict";
     class NoSelection {
         constructor() {
-            this.message = "Please Select a Contact.";
+            this.message = "Please Select a Leaderboard.";
         }
     }
     exports.NoSelection = NoSelection;
@@ -307,9 +294,9 @@ define('resources/elements/loading-indicator',["require", "exports", "nprogress"
     });
 });
 
-define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"./styles.css\"></require>\n  <require from=\"./contact-list\"></require>\n\n  <nav class=\"navbar navbar-default navbar-fixed-top\" role=\"navigation\">\n    <div class=\"navbar-header\">\n      <a class=\"navbar-brand\" href=\"#\">\n        <i class=\"fa fa-user\"></i>\n        <span>Contacts</span>\n      </a>\n    </div>\n  </nav>\n\n  <loading-indicator loading.bind=\"router.isNavigating || api.isRequesting\"></loading-indicator>\n\n  <div class=\"container\">\n    <div class=\"row\">\n      <contact-list class=\"col-md-4\"></contact-list>\n      <router-view class=\"col-md-8\"></router-view>\n    </div>\n  </div>\n</template>"; });
-define('text!styles.css', ['module'], function(module) { module.exports = "body {\n  padding-top: 70px; }\n\nsection {\n  margin: 0 20px; }\n\na:focus {\n  outline: none; }\n\n.navbar-nav li.loader {\n  margin: 12px 24px 0 6px; }\n\n.no-selection {\n  margin: 20px; }\n\n.contact-list {\n  overflow-y: auto;\n  border: 1px solid #ddd;\n  padding: 10px; }\n\n.panel {\n  margin: 20px; }\n\n.button-bar {\n  right: 0;\n  left: 0;\n  bottom: 0;\n  border-top: 1px solid #ddd;\n  background: white; }\n\n.button-bar > button {\n  float: right;\n  margin: 20px; }\n\nli.list-group-item {\n  list-style: none; }\n\nli.list-group-item > a {\n  text-decoration: none; }\n\nli.list-group-item.active > a {\n  color: white; }\n"; });
-define('text!contact-detail.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"panel panel-primary\">\r\n    <div class=\"panel-heading\">\r\n      <h3 class=\"panel-title\">Profile</h3>\r\n    </div>\r\n    <div class=\"panel-body\">\r\n      <form role=\"form\" class=\"form-horizontal\">\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">First Name</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"first name\" class=\"form-control\" value.bind=\"contact.firstName\">\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">Last Name</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"last name\" class=\"form-control\" value.bind=\"contact.lastName\">\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">Email</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"email\" class=\"form-control\" value.bind=\"contact.email\">\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">Phone Number</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"phone number\" class=\"form-control\" value.bind=\"contact.phoneNumber\">\r\n          </div>\r\n        </div>\r\n      </form>\r\n    </div>\r\n  </div>\r\n\r\n  <div class=\"button-bar\">\r\n    <button class=\"btn btn-success\" click.delegate=\"save()\" disabled.bind=\"!canSave\">Save</button>\r\n  </div>\r\n</template>"; });
-define('text!contact-list.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"contact-list\">\r\n    <ul class=\"list-group\">\r\n      <li repeat.for=\"contact of contacts\" class=\"list-group-item ${contact.id === $parent.selectedId ? 'active' : ''}\">\r\n        <a route-href=\"route: contacts; params.bind: {id:contact.id}\" click.delegate=\"$parent.select(contact)\">\r\n          <h4 class=\"list-group-item-heading\">${contact.firstName} ${contact.lastName}</h4>\r\n          <p class=\"list-group-item-text\">${contact.email}</p>\r\n        </a>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</template>"; });
+define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"./styles.css\"></require>\n  <require from=\"./leaderboard-list\"></require>\n\n  <nav class=\"navbar navbar-default navbar-fixed-top\" role=\"navigation\">\n    <div class=\"navbar-header\">\n      <a class=\"navbar-brand\" href=\"#\">\n        <i class=\"fa fa-user\"></i>\n        <span>Leaderboard</span>\n      </a>\n    </div>\n  </nav>\n\n  <loading-indicator loading.bind=\"router.isNavigating || api.isRequesting\"></loading-indicator>\n\n  <div class=\"container\">\n    <div class=\"row\">\n      <leaderboard-list class=\"col-md-4\"></leaderboard-list>\n      <router-view class=\"col-md-8\"></router-view>\n    </div>\n  </div>\n</template>"; });
+define('text!styles.css', ['module'], function(module) { module.exports = "body {\n  padding-top: 70px; }\n\nsection {\n  margin: 0 20px; }\n\na:focus {\n  outline: none; }\n\n.navbar-nav li.loader {\n  margin: 12px 24px 0 6px; }\n\n.no-selection {\n  margin: 20px; }\n\n.leaderboard-list {\n  overflow-y: auto;\n  border: 1px solid #ddd;\n  padding: 10px; }\n\n.panel {\n  margin: 20px; }\n\n.button-bar {\n  right: 0;\n  left: 0;\n  bottom: 0;\n  border-top: 1px solid #ddd;\n  background: white; }\n\n.button-bar > button {\n  float: right;\n  margin: 20px; }\n\nli.list-group-item {\n  list-style: none; }\n\nli.list-group-item > a {\n  text-decoration: none; }\n\nli.list-group-item.active > a {\n  color: white; }\n"; });
+define('text!leaderboard-detail.html', ['module'], function(module) { module.exports = "<template>\r\n  <table class=\"table table-striped table-condensed\">\r\n    <tr repeat.for=\"record of records\">\r\n      <td>rank</td>\r\n      <td>${record.teamName}</td>\r\n      <td>${record.numSubmissions}</td>\r\n      <td>${record.score}</td>\r\n    </tr>\r\n  </table>\r\n</template>"; });
+define('text!leaderboard-list.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"leaderboard-list\">\r\n    <ul class=\"list-group\">\r\n      <li repeat.for=\"leaderboard of leaderboards\" class=\"list-group-item ${leaderboard === $parent.selectedId ? 'active' : ''}\">\r\n        <a route-href=\"route: leaderboard; params.bind: {id:leaderboard}\" click.delegate=\"$parent.select(leaderboard)\">\r\n          <h4 class=\"list-group-item-heading\">${leaderboard}</h4>\r\n        </a>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</template>"; });
 define('text!no-selection.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"no-selection text-center\">\r\n    <h2>${message}</h2>\r\n  </div>\r\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map
