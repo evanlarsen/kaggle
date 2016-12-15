@@ -19,15 +19,15 @@
     "xunit.extensibility.core": "2.1.0",
     "xunit.extensibility.execution": "2.1.0",
     "xunit.runner.console": "2.1.0",
-    "xunit.runner.visualstudio": "2.1.0",
+    "xunit.runner.visualstudio": "2.1.0"
   },
-
+  "testRunner": "xunit",
   "tools": {
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.0.0-preview2-final"
   },
 
   "frameworks": {
-    "net452": { }
+    "net452": {}
   },
 
   "buildOptions": {
