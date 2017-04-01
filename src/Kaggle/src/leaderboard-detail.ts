@@ -22,7 +22,6 @@ export class LeaderboardDetail {
     });
   }
 
-  interface 
   attached() {
     (<any>$('a[data-toggle=popover]')).popover();
   }
